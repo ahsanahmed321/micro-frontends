@@ -1,11 +1,12 @@
-import React from "react";
+import Button from './Button';
+import React from 'react';
 
-function App() {
-  return (
-    <div className="App">
-      <h1>Remote React App </h1>
-    </div>
-  );
-}
+const App = () => (
+  <div>
+    <h1>Next JS with React</h1>
+    <h2>Remote App</h2>
+    <Button />
+  </div>
+);
 
 export default App;

@@ -1,59 +1,58 @@
-// remote/webpack.config.js
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
-const path = require("path");
-const { dependencies } = require("./package.json");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { ModuleFederationPlugin } = require('webpack').container;
+const path = require('path');
+const { dependencies } = require('./package.json');
 
 module.exports = {
-  entry: "./src/index",
-  mode: "development",
+  entry: './src/index',
+  mode: 'development',
   devServer: {
     static: {
-      directory: path.join(__dirname, "public"),
+      directory: path.join(__dirname, 'dist'),
     },
-    port: 4000,
+    port: 3001,
+  },
+  output: {
+    publicPath: 'http://localhost:3001/',
   },
   module: {
     rules: [
       {
-        test: /\.(js|jsx)?$/,
+        test: /\.jsx?$/,
+        loader: 'babel-loader',
         exclude: /node_modules/,
-        use: [
-          {
-            loader: "babel-loader",
-            options: {
-              presets: ["@babel/preset-env", "@babel/preset-react"],
-            },
-          },
-        ],
+        options: {
+          presets: ['@babel/preset-react'],
+        },
       },
     ],
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "Remote",
-      filename: "remoteEntry.js",
+      name: 'remote',
+      library: { type: 'var', name: 'remote' },
+      filename: 'remote.js',
       exposes: {
-        "./App": "./src/App",
+        './Button': './src/Button',
       },
       shared: {
-        ...dependencies,
+        '@stitches/react': {
+          singleton: true,
+        },
         react: {
           singleton: true,
-          requiredVersion: dependencies["react"],
+          version: '0',
+          requiredVersion: false,
         },
-        "react-dom": {
+        'react-dom': {
+          requiredVersion: false,
           singleton: true,
-          requiredVersion: dependencies["react-dom"],
+          version: '0',
         },
       },
     }),
     new HtmlWebpackPlugin({
-      template: "./public/index.html",
+      template: './public/index.html',
     }),
   ],
-  resolve: {
-    extensions: [".js", ".jsx"],
-  },
-  target: "web",
 };
